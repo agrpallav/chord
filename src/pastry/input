@@ -1,0 +1,6 @@
+# 1. op		2. qid/nid		3. nid		4. x	5.y 		
+# arg1: op: na:node add, nd: node delete, nf:node find,	qa: querry add
+# arg2: node id/ query id referred by the op
+# arg3: node id of the node on which the op is made
+# arg4,5: x,y co-ordinates of of the node (used only when op=na)
+
