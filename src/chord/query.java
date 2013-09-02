@@ -39,7 +39,7 @@ public class query
 
 	public void setCnode(node cnode) throws valid_not_checked
 	{
-		if (cnode.isValid()==0) throw new valid_not_checked();
+		//if (cnode.isValid()==0) throw new valid_not_checked();
 		sender=this.cnode;
 		this.cnode = cnode;
 		road.add(cnode);

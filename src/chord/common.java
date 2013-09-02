@@ -9,8 +9,8 @@ import java.util.concurrent.locks.ReentrantLock;
 public class common {
 
 	public static final int b=4;
-	public static final int maxNodes=100;
-	public static final int keyLength=32;
+	public static final int maxNodes=10000;
+	public static final int keyLength=60;
 	public static final int maxX=10000;
 	public static final int maxY=10000;
 	public static final int sizeL=8;	//size of left and right leaf set 
@@ -53,8 +53,8 @@ public class common {
 	{
 		String l="";
 		//if (q.getKey()!=null) l="("+simulate.shl(q.getCnode().getKey(),q.getKey())+")";
-		out+="\n"+q.qid+"\t"+q.pqid+"\t"+simulate.tnodes+"\t"+q.qtype.name()+"\t"+q.getCnode().getId()+"\t"+q.getIter()+"\tstep="+q.step+"\tqfound="+q.getFound();
-		if (q.road.size()>1) out+="t"+q.road.get(q.road.size()-2).getId(); 
+		out+="\nqid="+q.qid+"\tpqid="+q.pqid+"\total="+simulate.tnodes+"\t"+q.qtype.name()+"\tcnode="+q.getCnode().getId()+"\tinode="+q.inode.getId()+"\titer="+q.getIter()+"\tstep="+q.step+"\tqfound="+q.getFound();
+//		if (q.road.size()>1) out+="t"+q.road.get(q.road.size()-2).getId(); 
 		if (out.length()>1)
 		{
 			System.out.print(out);
@@ -129,5 +129,11 @@ public class common {
 	
 	synchronized public void loge(String s) {
 		
+	}
+	
+	static boolean inBetween(long i, long e, long k) throws pval_error, make_key_error
+	{
+		if (compareKeys(k, i+1)<=compareKeys(e,i+1)) return true;
+		return false;
 	}
 }

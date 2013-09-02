@@ -20,7 +20,7 @@ public class node
 	private node[] finger = new node[common.keyLength];
 	public int ffilled=0;
 	
-	private node predec;
+	private node predec=null;
 	
 	private int active=0;
 	
@@ -125,7 +125,7 @@ public class node
 		for (int i=ffilled-1;i>=0;i--)
 		{
 			dist1=common.compareKeys(finger[i].getKey(),getKey()+1);
-			if (dist1<dist)
+			if (dist1<=dist)
 			{
 				ret=finger[i];
 				break;

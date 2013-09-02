@@ -43,21 +43,21 @@ public class simulate
 	{
 		@SuppressWarnings("resource")
 		BufferedReader in = new BufferedReader(new FileReader(inputF));
-		
+
 		String text;
 		int arg1,arg2,arg3;
 		String[] word;
 		node n;
 		query q=null;
 		common.out("Process Input starting loop");
-		
+
 		while ((text=in.readLine())!=null)
 		{
 			if (text.subSequence(0,1).equals("#")) continue;
-			common.out("Processing: "+text);
-			
+			//common.out("\nProcessing: "+text);
+
 			word=text.split("\t");
-			
+
 			if (word[0].equals("na"))
 			{
 				arg1=Integer.parseInt(word[2]); //id
@@ -128,12 +128,12 @@ public class simulate
 	{
 		node n=new node(2,0,0);
 		node m=new node(3,99,99);
-//		n.setFinger(0,m);
-//		n.setPredec(m);
-//		n.ffilled++;
-//		m.setFinger(0,n);
-//		m.setPredec(n);
-//		m.ffilled++;
+		//		n.setFinger(0,m);
+		//		n.setPredec(m);
+		//		n.ffilled++;
+		//		m.setFinger(0,n);
+		//		m.setPredec(n);
+		//		m.ffilled++;
 		for (int i=0;i<common.keyLength;i++)
 		{
 			n.setFinger(i,n);
@@ -146,7 +146,7 @@ public class simulate
 			i++;
 			if (i==common.keyLength) break;
 		}
-		
+
 		i=0;
 		while(common.compareKeys(n.getKey(),m.getKey())>common.compareKeys(m.getStartIndex(i),m.getKey()))
 		{
@@ -162,11 +162,11 @@ public class simulate
 		m.setActive(1);
 		n.ffilled=common.keyLength;
 		m.ffilled=common.keyLength;
-//		query q = new query(QTYPE.NODEADD,m.getKey().and(BigInteger.ONE),m);
-//		q.setCnode(n);
-//		q.arg1=0;
-//		enq(q);
-		start();
+		//		query q = new query(QTYPE.NODEADD,m.getKey().and(BigInteger.ONE),m);
+		//		q.setCnode(n);
+		//		q.arg1=0;
+		//		enq(q);
+		//start();
 
 	}
 
@@ -206,7 +206,7 @@ public class simulate
 
 	void start() throws valid_not_checked, pval_error, make_key_error, UnsupportedEncodingException, NoSuchAlgorithmException, infinite_loop, wrong_routing, validate_failed 
 	{
-		common.out("Start called");
+		//common.out("Start called");
 		int i=0;
 		parentq=queryq.peek();
 		while(!queryq.isEmpty())
@@ -214,15 +214,15 @@ public class simulate
 			i++;
 			processq(queryq.poll());
 			//if (i>10000) throw new infinite_loop();
-			validate();
-		}
+
+		}validate();
 		i=0;
 		if (parentq!=null && parentq.qtype==QTYPE.NODEADD) tnodes++;
 		parentq=null;
 		//		dumpstate();
-		
+
 	}
-	
+
 
 	void enq(query q)
 	{
@@ -232,7 +232,7 @@ public class simulate
 			Thread.dumpStack();
 			System.exit(0);
 		}
-		
+
 		if (parentq==null) q.pqid=q.qid;
 		else q.pqid=parentq.qid;
 		query tq;
@@ -249,7 +249,7 @@ public class simulate
 		queryq.add(q);
 	}
 
-	void processq(query q) throws pval_error, make_key_error, valid_not_checked, wrong_routing
+	void processq(query q) throws pval_error, make_key_error, valid_not_checked, wrong_routing, validate_failed
 	{
 		q.incIter();
 		common.output(q);
@@ -257,14 +257,14 @@ public class simulate
 		currentq=q;
 		node tn;
 		qbuf.clear();
-		
+
 		if (q.skip>0) 
 		{
 			q.skip--;
 			enq(q);
 			return;
 		}
-		
+
 		if (q.qtype==QTYPE.NODEFIND)
 		{
 			if (q.step==0)
@@ -291,9 +291,12 @@ public class simulate
 			if (tn==null)
 			{
 				query tq=new query(QTYPE.FINGER,0,curnode);
-				tq.setCnode(q.inode);
+				tq.setCnode(q.inode); //q.inode is the node we are trying to add.
 				tq.arg1=q.arg1;
 				enq(tq);
+
+				if (!common.inBetween(q.inode.getKey(), curnode.nextNode().getKey(), q.inode.getStartIndex(q.arg1))) throw new validate_failed();
+
 				return;
 			}
 			else
@@ -306,25 +309,34 @@ public class simulate
 		else if (q.qtype==QTYPE.FINGER)
 		{
 			node toset=q.inode.nextNode();
-			//if (toset==null) toset=q.inode;
-			if (curnode.ffilled==0) curnode.setPredec(q.inode);
+			// if (toset==null) toset=q.inode;
+
+			if (curnode.ffilled==0) {
+				curnode.setPredec(q.inode);
+				curnode.setFinger(0,toset);
+				curnode.ffilled++;
+				nodeComplete(curnode);
+			}
+
 			int in=q.arg1;
 			while (// q.arg1==curnode.ffilled ||
-					 (in==curnode.ffilled &&
-							common.compareKeys(curnode.getStartIndex(in),curnode.getKey()+1)<common.compareKeys(toset.getKey(),curnode.getKey()+1))
+					in<common.keyLength &&
+					(in==curnode.ffilled &&
+					common.compareKeys(curnode.getStartIndex(in),curnode.getKey()+1)<=common.compareKeys(toset.getKey(),curnode.getKey()+1))
 					|| (in<curnode.ffilled &&
-							common.compareKeys(toset.getKey(),curnode.getStartIndex(in)+1)<common.compareKeys(curnode.getFinger(in).getKey(),curnode.getStartIndex(in)+1)))
+							common.compareKeys(toset.getKey(),curnode.getStartIndex(in)+1)<=common.compareKeys(curnode.getFinger(in).getKey(),curnode.getStartIndex(in)+1)))
 			{
 				curnode.setFinger(in,toset);
 				if (in==curnode.ffilled) curnode.ffilled++;
-				if (in<common.keyLength-1) in++;
+				if (in<common.keyLength) in++;
 			}
-			
+
+
 			if (curnode.isActive()==0) 
 			{
 				if (curnode.ffilled==common.keyLength)
 				{
-					nodeComplete(curnode);
+					curnode.setActive(1);
 					return;
 				}
 				else
@@ -336,19 +348,19 @@ public class simulate
 					enq(tq);
 				}
 			}
-//			
-//			while (common.compareKeys(q.getKey(),curnode.getKey()).compareTo(common.compareKeys(curnode.getFinger(curnode.ffilled-1).getKey(),curnode.getKey()))<0)
-//			{
-//				curnode.setFinger(curnode.ffilled,toset);
-//				curnode.ffilled++;
-//				if (curnode.ffilled==common.bkeyLength) 
-//				{
-//					nodeComplete(curnode);
-//					return;
-//				}
-//			}
+			//			
+			//			while (common.compareKeys(q.getKey(),curnode.getKey()).compareTo(common.compareKeys(curnode.getFinger(curnode.ffilled-1).getKey(),curnode.getKey()))<0)
+			//			{
+			//				curnode.setFinger(curnode.ffilled,toset);
+			//				curnode.ffilled++;
+			//				if (curnode.ffilled==common.bkeyLength) 
+			//				{
+			//					nodeComplete(curnode);
+			//					return;
+			//				}
+			//			}
 		}
-		
+
 		else if (q.qtype==QTYPE.REGISTER)
 		{
 			if (q.arg1==-1)
@@ -362,15 +374,18 @@ public class simulate
 				if (tn==null)
 				{
 					q.step=1;
-					if (common.compareKeys(q.inode.getKey(),curnode.getKey()+1)<common.compareKeys(curnode.getFinger(q.arg1).getKey(),curnode.getKey()+1))
-					{
-						if (common.compareKeys(curnode.getStartIndex(q.arg1),curnode.getKey())<common.compareKeys(q.inode.getKey(),curnode.getKey()))
-						{
+					if (q.arg1>=curnode.ffilled) {
+						q.setCnode(curnode.getPredec());
+						enq(q);
+						return;
+					}
+					if (curnode.getFinger(q.arg1).getKey()== q.inode.getKey()) return;
+					if (curnode.getFinger(q.arg1)!=null && common.inBetween(curnode.getStartIndex(q.arg1), curnode.getFinger(q.arg1).getKey(), q.inode.getKey())) {
 						curnode.setFinger(q.arg1,q.inode);
 						q.setCnode(curnode.getPredec());
 						enq(q);
-						}
 					}
+					
 					//else throw new wrong_routing();
 					return;
 				}
@@ -380,26 +395,31 @@ public class simulate
 			}
 			else
 			{
-				if (common.compareKeys(q.inode.getKey(),curnode.getKey()+1)<common.compareKeys(curnode.getFinger(q.arg1).getKey(),curnode.getKey()+1))
-				{
-					if (common.compareKeys(curnode.getStartIndex(q.arg1),curnode.getKey()+1)<common.compareKeys(q.inode.getKey(),curnode.getKey()+1))
-					{
+				if (curnode.getKey()==q.getKey()) return;
+				if (q.arg1>=curnode.ffilled) {
+					q.setCnode(curnode.getPredec());
+					enq(q);
+					return;
+				}
+				if (curnode.getFinger(q.arg1).getKey()== q.inode.getKey()) return;
+				if (curnode.getFinger(q.arg1)!=null && common.inBetween(curnode.getStartIndex(q.arg1), curnode.getFinger(q.arg1).getKey(), q.inode.getKey())) {
 					curnode.setFinger(q.arg1,q.inode);
 					q.setCnode(curnode.getPredec());
 					enq(q);
-					}
 				}
+				
 				return;
 			}
 		}
 	}
-	
+
 	void nodeComplete(node n) throws pval_error, make_key_error, valid_not_checked
 	{
 		query tq;
 		node tn;
 		long k;
-		n.setActive(1);
+
+		//n.setActive(1);
 		for (int i=0;i<common.keyLength;i++)
 		{
 			k=curnode.getRegisterIndex(i);
@@ -415,19 +435,19 @@ public class simulate
 		tq.arg1=-1;
 		enq(tq);
 	}
-	
+
 	void stabilize()
 	{
-		
+
 	}
-	
+
 	static int tol=0;
 	int prev=2;
 	void validate() throws validate_failed, pval_error, make_key_error
 	{
 		//if (tol==0) throw new validate_failed();
 		int i=1;
-		node s=startNode.nextNode();
+		node s=startNode;
 		boolean success=true;
 		long diff;
 		while((s=s.nextNode()).getId()!=startNode.getId())
@@ -448,7 +468,10 @@ public class simulate
 				if (diff<common.compareKeys(s.getStartIndex(j),s.getKey())) throw new validate_failed();
 			}
 		}
-//		if (i<prev) throw new validate_failed();
-//		prev++;
+		i++;
+		int ss=node.allnodes.size();
+		if (ss-i>1) throw new validate_failed();
+		//		if (i<prev) throw new validate_failed();
+		//		prev++;
 	}
 }
