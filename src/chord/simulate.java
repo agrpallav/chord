@@ -10,24 +10,26 @@ import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import pastry.node_not_found;
+
 
 
 public class simulate
 {
 	final String inputF="Input";
 
-	node startNode=null;
 	BlockingQueue<query> queryq=new LinkedBlockingQueue<query>();
 	public query currentq=null;
 	node curnode;
-	int totalNodes=2;
+	//int totalNodes=2;
 	List<query> qbuf=new ArrayList<query>();
 	query parentq;
 	public static int tnodes=2;
 
+	static simulate obj;
 	public static void main(String[] args) throws Exception
 	{
-		simulate obj = new simulate();
+		obj = new simulate();
 		obj.init();
 
 		//		if (args.length>0 && args[0].equals("1"))
@@ -39,13 +41,13 @@ public class simulate
 		obj.processInput();
 	}
 
-	void processInput() throws NoSuchAlgorithmException, make_key_error, NumberFormatException, IOException, invalid_input, valid_not_checked, pval_error, infinite_loop, wrong_routing, validate_failed
+	void processInput() throws NoSuchAlgorithmException, make_key_error, NumberFormatException, IOException, invalid_input, valid_not_checked, pval_error, infinite_loop, wrong_routing, validate_failed, node_not_found
 	{
 		@SuppressWarnings("resource")
 		BufferedReader in = new BufferedReader(new FileReader(inputF));
 
 		String text;
-		int arg1,arg2,arg3;
+		int arg1,arg2,arg3,arg4;
 		String[] word;
 		node n;
 		query q=null;
@@ -63,32 +65,57 @@ public class simulate
 				arg1=Integer.parseInt(word[2]); //id
 				arg2=Integer.parseInt(word[3]); //x
 				arg3=Integer.parseInt(word[4]); //y
-				n=new node(arg1,arg2,arg3);
+				arg4=Integer.parseInt(word[5]); //level
+				n=new node(arg1,arg2,arg3,arg4);
 				q=addNode(n);
 			}
 			else if(word[0].equals("nf"))
 			{
-				int[] done=new int[common.maxNodes];
-				node s=startNode;
-				done[s.getId()]=1;
-				while((s=s.nextNode()).getId()!=startNode.getId()){done[s.getId()]=1;}
-				int c=0;
-				for (int i=1;i<common.maxNodes;i++)
-					if (done[i]==0) c++;
-				common.out("--------------"+c+"");
-
-				//					arg1=Integer.parseInt(word[2]); //id
-				//					arg2=Integer.parseInt(word[3]); //snid
-				//					getNodebyId(100);
-				//					n=getNodebyId(arg2); //find the node from snid
-				//					
-				//					q=new query(QTYPE.NODEFIND,common.makeKey(common.md5(word[2]), common.b), n);
+//				int[] done=new int[common.maxNodes];
+//				node s=startNode;
+//				done[s.getId()]=1;
+//				while((s=s.nextNode()).getId()!=startNode.getId()){done[s.getId()]=1;}
+//				int c=0;
+//				for (int i=1;i<common.maxNodes;i++)
+//					if (done[i]==0) c++;
+//				common.out("--------------"+c+"");
+//
+//				//					arg1=Integer.parseInt(word[2]); //id
+//				//					arg2=Integer.parseInt(word[3]); //snid
+//				//					getNodebyId(100);
+//				//					n=getNodebyId(arg2); //find the node from snid
+//				//					
+//				//					q=new query(QTYPE.NODEFIND,common.makeKey(common.md5(word[2]), common.b), n);
 			}
 			else if(word[0].equals("nd"))
 			{
-				q=new query(QTYPE.NODEDEL,0,startNode);
-				arg1=Integer.parseInt(word[2]); //id
-				q.arg1=arg1;
+//				q=new query(QTYPE.NODEDEL,0,startNode);
+//				arg1=Integer.parseInt(word[2]); //id
+//				q.arg1=arg1;
+			}
+			else if(word[0].equals("ka"))
+			{
+				int id = Integer.parseInt(word[2]);
+				long key = common.makeKey(word[3]);
+				node t=node.nodeFind(id); 
+				if (t==null) throw new node_not_found();
+				q=new query(QTYPE.KEYADD, key, t);
+			}
+			else if(word[0].equals("kf"))
+			{
+				int id = Integer.parseInt(word[2]);
+				long key = common.makeKey(word[3]);
+				node t=node.nodeFind(id); 
+				if (t==null) throw new node_not_found();
+				q=new query(QTYPE.KEYFIND, key, t);
+			}
+			else if(word[0].equals("kd"))
+			{
+				int id = Integer.parseInt(word[2]);
+				long key = common.makeKey(word[3]);
+				node t=node.nodeFind(id); 
+				if (t==null) throw new node_not_found();
+				q=new query(QTYPE.KEYDEL, key, t);
 			}
 			else 
 			{
@@ -126,48 +153,10 @@ public class simulate
 
 	void init() throws UnsupportedEncodingException, NoSuchAlgorithmException, make_key_error, pval_error, valid_not_checked, infinite_loop, wrong_routing, validate_failed
 	{
-		node n=new node(2,0,0);
-		node m=new node(3,99,99);
-		//		n.setFinger(0,m);
-		//		n.setPredec(m);
-		//		n.ffilled++;
-		//		m.setFinger(0,n);
-		//		m.setPredec(n);
-		//		m.ffilled++;
-		for (int i=0;i<common.keyLength;i++)
-		{
-			n.setFinger(i,n);
-			m.setFinger(i,m);
-		}
-		int i=0;
-		while(common.compareKeys(m.getKey(),n.getKey())>common.compareKeys(n.getStartIndex(i),n.getKey()))
-		{
-			n.setFinger(i,m);
-			i++;
-			if (i==common.keyLength) break;
-		}
-
-		i=0;
-		while(common.compareKeys(n.getKey(),m.getKey())>common.compareKeys(m.getStartIndex(i),m.getKey()))
-		{
-			m.setFinger(i,n);
-			i++;
-			if (i==common.keyLength) break;
-		}
-
-		startNode=n;
-		n.setPredec(m);
-		m.setPredec(n);
-		n.setActive(1);
-		m.setActive(1);
-		n.ffilled=common.keyLength;
-		m.ffilled=common.keyLength;
-		//		query q = new query(QTYPE.NODEADD,m.getKey().and(BigInteger.ONE),m);
-		//		q.setCnode(n);
-		//		q.arg1=0;
-		//		enq(q);
-		//start();
-
+		int totalLevels=4;
+		Level.levels=new Level[totalLevels];
+		for (int i=0;i<totalLevels;i++)
+			Level.levels[i]=new Level(i);
 	}
 
 	query addNode(node n) throws valid_not_checked 
@@ -190,9 +179,9 @@ public class simulate
 
 	node nearestNode(node n)
 	{
-		node cnode=startNode,minNode=startNode;
+		node cnode=Level.levels[n.level].startNode,minNode=cnode,snode=cnode;
 		int min=common.edistance(n,cnode),dist;
-		while ((cnode=cnode.nextNode()).getId()!=startNode.getId())
+		while ((cnode=cnode.nextNode()).getId()!=snode.getId())
 		{
 			dist=(int)Math.abs(n.getX()-cnode.getX())+(int)Math.abs(n.getY()-cnode.getY());
 			if (min>dist && cnode.isValid()==1) 
@@ -411,6 +400,21 @@ public class simulate
 				return;
 			}
 		}
+		else if(q.qtype==QTYPE.KEYFIND)
+		{
+			tn = curnode.findPred(q.getKey());
+			if (tn==null)
+			{
+				//curnode.keys
+				return;
+			}
+			else
+			{
+				q.setCnode(tn);
+				enq(q);
+				return;
+			}
+		}
 	}
 
 	void nodeComplete(node n) throws pval_error, make_key_error, valid_not_checked
@@ -443,35 +447,10 @@ public class simulate
 
 	static int tol=0;
 	int prev=2;
-	void validate() throws validate_failed, pval_error, make_key_error
-	{
-		//if (tol==0) throw new validate_failed();
-		int i=1;
-		node s=startNode;
-		boolean success=true;
-		long diff;
-		while((s=s.nextNode()).getId()!=startNode.getId())
-		{
-			i++;
-			if (i>common.maxNodes) 
-			{
-				if (tol==0)throw new validate_failed();
-				else tol--;
-				success=false;
-				break;
-			}
-			for (int j=0;j<common.keyLength;j++)
-			{
-				//if (tol==0) throw new validate_failed();
-				diff=common.compareKeys(s.getFinger(j).getKey(),s.getKey());
-				if (diff==0) diff=common.maxN;
-				if (diff<common.compareKeys(s.getStartIndex(j),s.getKey())) throw new validate_failed();
-			}
+	
+	void validate() throws validate_failed, pval_error, make_key_error {
+		for (int i=0;i<Level.levels.length;i++) {
+			Level.levels[i].validate();
 		}
-		i++;
-		int ss=node.allnodes.size();
-		if (ss-i>1) throw new validate_failed();
-		//		if (i<prev) throw new validate_failed();
-		//		prev++;
 	}
 }

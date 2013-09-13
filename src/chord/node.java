@@ -1,9 +1,9 @@
 package chord;
 
 import java.io.UnsupportedEncodingException;
-import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 
@@ -18,9 +18,51 @@ public class node
 
 	private int valid=1;
 	private node[] finger = new node[common.keyLength];
+	public List<Long> keys;
 	public int ffilled=0;
-	
+	public final int level;
 	private node predec=null;
+	
+	public query curqry;
+	public node upLevel;
+	
+	List<Wait> waitList = new ArrayList<Wait>();
+	
+	void processWaitList() throws valid_not_checked {
+		if (waitList.isEmpty()) return;
+		
+		Iterator<Wait> it = waitList.iterator();
+		Wait t;
+		while(it.hasNext()) {
+			t=it.next();
+			t.ttl--;
+			if (t.ttl==0) {
+				if (t.ack==1) {
+					query q = new query(QTYPE.PING, 0, this);
+					q.setCnode(t.n);
+					q.w=t;
+				}
+				else {
+					query q= new query(QTYPE.KEYFIND, t.q.getKey(), this);
+					curqry=q;
+					node nod=getUpLevel();
+					if (nod==null) continue;
+					q.setCnode(nod);
+					simulate.obj.enq(q);
+				}
+			}
+		}
+	}
+	
+	node getUpLevel() throws valid_not_checked {
+		if (upLevel!=null) return upLevel;
+		query q=new query(QTYPE.UPLEVEL, 0, this);
+		q.prevq=curqry;
+		curqry=q;
+		q.setCnode(nextNode());
+		simulate.obj.enq(q);
+		return null;
+	}
 	
 	private int active=0;
 	
@@ -52,14 +94,17 @@ public class node
 		count--;
 	}
 	
-	public node(int id,int x, int y) throws UnsupportedEncodingException, NoSuchAlgorithmException, make_key_error 
+	public node(int id, int x, int y, int level) throws UnsupportedEncodingException, NoSuchAlgorithmException, make_key_error 
 	{
 		makeKey(id);
 		this.x=x;
 		this.y=y;
 		this.id=id;
+		this.level=level;
 		count++;
 		allnodes.add(this);
+		Level.levels[level].nodes.add(this);
+		keys=new ArrayList<Long>();
 	}
 	
 	public node getFinger(int i)
@@ -156,5 +201,15 @@ public class node
 		if (ret<0)
 			ret=ret+common.maxN;
 		return ret;
+	}
+	
+	static node nodeFind(int id)
+	{
+		node t=null;
+		for(int i=0;i<allnodes.size();i++) {
+			t=allnodes.get(i);
+			if (t.id==id) return t;
+		}
+		return null;
 	}
 }

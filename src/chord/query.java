@@ -1,6 +1,7 @@
 package chord;
 
 import java.util.ArrayList;
+import java.util.Stack;
 
 
 public class query
@@ -20,6 +21,11 @@ public class query
 	int step=0; 
 	public node extran;
 	public int pqid;
+	public Wait w;
+	
+	public query prevq=null;
+	
+	public Stack<node> recievers=new Stack<node>();
 	
 	public query(QTYPE type,long key,node n)
 	{

@@ -53,7 +53,7 @@ public class common {
 	{
 		String l="";
 		//if (q.getKey()!=null) l="("+simulate.shl(q.getCnode().getKey(),q.getKey())+")";
-		out+="\nqid="+q.qid+"\tpqid="+q.pqid+"\total="+simulate.tnodes+"\t"+q.qtype.name()+"\tcnode="+q.getCnode().getId()+"\tinode="+q.inode.getId()+"\titer="+q.getIter()+"\tstep="+q.step+"\tqfound="+q.getFound();
+		out+="\nqid="+q.qid+"\tpqid="+q.pqid+"\ttotal="+simulate.tnodes+"\t"+q.qtype.name()+"\tcnode="+q.getCnode().getId()+"\tinode="+q.inode.getId()+"\titer="+q.getIter()+"\tstep="+q.step+"\tqfound="+q.getFound();
 //		if (q.road.size()>1) out+="t"+q.road.get(q.road.size()-2).getId(); 
 		if (out.length()>1)
 		{

@@ -6,8 +6,18 @@ public enum QTYPE
 	NODEFIND,
 	NODEDEL,
 	
+	KEYADD,
+	KEYFIND,
+	KEYDEL,
+	
 	FINGER,
 //	PREDEC,
-	REGISTER
+	REGISTER,
+	PING,
+	
+	UPLEVEL,
+	
+	TTL
+	
 	
 }
