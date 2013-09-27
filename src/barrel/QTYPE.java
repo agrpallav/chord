@@ -5,5 +5,6 @@ public enum QTYPE {
 	KEYFIND,
 	KEYADD,
 	KEYDEL,
-	FINGER
+	FINGER,
+	REGISTER
 }

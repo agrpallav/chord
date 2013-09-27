@@ -72,7 +72,7 @@ public class Common {
 	
 	static boolean inBetween(long i, long e, long k) throws pval_error, MakeKeyException
 	{
-		if (compareKeys(k, i+1)<=compareKeys(e,i+1)) return true;
+		if (compareKeys(k, i+1)<compareKeys(e,i+1)) return true;
 		return false;
 	}
 	
