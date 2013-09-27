@@ -80,7 +80,7 @@ public class node
 		active=v;
 	}
 	
-	final void makeKey(int id) throws UnsupportedEncodingException, NoSuchAlgorithmException, make_key_error
+	final void makeKey(int id) throws UnsupportedEncodingException, NoSuchAlgorithmException, MakeKeyException
 	{
 		key=common.makeKey(Integer.toString(id));
 	}
@@ -94,7 +94,7 @@ public class node
 		count--;
 	}
 	
-	public node(int id, int x, int y, int level) throws UnsupportedEncodingException, NoSuchAlgorithmException, make_key_error 
+	public node(int id, int x, int y, int level) throws UnsupportedEncodingException, NoSuchAlgorithmException, MakeKeyException 
 	{
 		makeKey(id);
 		this.x=x;
@@ -160,9 +160,9 @@ public class node
 	 * @param id
 	 * @return if null then this is the pred // do query found=1 and send to this.next();
 	 * @throws pval_error
-	 * @throws make_key_error
+	 * @throws MakeKeyException
 	 */
-	node findPred(long key) throws pval_error, make_key_error
+	node findPred(long key) throws pval_error, MakeKeyException
 	{
 		long dist=common.compareKeys(key,getKey()+1);
 		long dist1;

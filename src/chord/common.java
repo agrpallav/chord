@@ -72,12 +72,12 @@ public class common {
 	 * @param k the binary array
 	 * @param b to be converted to base b
 	 * @return
-	 * @throws make_key_error 
+	 * @throws MakeKeyException 
 	 * @throws NoSuchAlgorithmException 
 	 * @throws UnsupportedEncodingException 
 	 * @throws Exception 
 	 */
-	public static final long makeKey(String s) throws make_key_error, UnsupportedEncodingException, NoSuchAlgorithmException
+	public static final long makeKey(String s) throws MakeKeyException, UnsupportedEncodingException, NoSuchAlgorithmException
 	{
 		byte[] k = md5(s);
 		
@@ -86,7 +86,7 @@ public class common {
 			key=key<<8;
 			key+=(long)Math.abs(k[i]);
 		
-			if (key<0 || key > maxN) throw new make_key_error();
+			if (key<0 || key > maxN) throw new MakeKeyException();
 		}
 		return key;
 	}
@@ -107,14 +107,14 @@ public class common {
 	 * @param key2
 	 * @return
 	 * @throws pval_error 
-	 * @throws make_key_error 
+	 * @throws MakeKeyException 
 	 */
-	public static long compareKeys(long key1, long key2) throws pval_error, make_key_error
+	public static long compareKeys(long key1, long key2) throws pval_error, MakeKeyException
 	{
 		long dist = key1-key2;
 		if (dist<0)
 			dist=dist+maxN;
-		if (dist<0 || dist > maxN) throw new make_key_error();
+		if (dist<0 || dist > maxN) throw new MakeKeyException();
 		return dist;
 	}
 	
@@ -131,7 +131,7 @@ public class common {
 		
 	}
 	
-	static boolean inBetween(long i, long e, long k) throws pval_error, make_key_error
+	static boolean inBetween(long i, long e, long k) throws pval_error, MakeKeyException
 	{
 		if (compareKeys(k, i+1)<=compareKeys(e,i+1)) return true;
 		return false;

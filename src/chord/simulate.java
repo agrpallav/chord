@@ -41,7 +41,7 @@ public class simulate
 		obj.processInput();
 	}
 
-	void processInput() throws NoSuchAlgorithmException, make_key_error, NumberFormatException, IOException, invalid_input, valid_not_checked, pval_error, infinite_loop, wrong_routing, validate_failed, node_not_found
+	void processInput() throws NoSuchAlgorithmException, MakeKeyException, NumberFormatException, IOException, invalid_input, valid_not_checked, pval_error, infinite_loop, wrong_routing, validate_failed, node_not_found
 	{
 		@SuppressWarnings("resource")
 		BufferedReader in = new BufferedReader(new FileReader(inputF));
@@ -151,7 +151,7 @@ public class simulate
 		in.close();
 	}
 
-	void init() throws UnsupportedEncodingException, NoSuchAlgorithmException, make_key_error, pval_error, valid_not_checked, infinite_loop, wrong_routing, validate_failed
+	void init() throws UnsupportedEncodingException, NoSuchAlgorithmException, MakeKeyException, pval_error, valid_not_checked, infinite_loop, wrong_routing, validate_failed
 	{
 		int totalLevels=4;
 		Level.levels=new Level[totalLevels];
@@ -193,7 +193,7 @@ public class simulate
 		return minNode;
 	}
 
-	void start() throws valid_not_checked, pval_error, make_key_error, UnsupportedEncodingException, NoSuchAlgorithmException, infinite_loop, wrong_routing, validate_failed 
+	void start() throws valid_not_checked, pval_error, MakeKeyException, UnsupportedEncodingException, NoSuchAlgorithmException, infinite_loop, wrong_routing, validate_failed 
 	{
 		//common.out("Start called");
 		int i=0;
@@ -238,7 +238,7 @@ public class simulate
 		queryq.add(q);
 	}
 
-	void processq(query q) throws pval_error, make_key_error, valid_not_checked, wrong_routing, validate_failed
+	void processq(query q) throws pval_error, MakeKeyException, valid_not_checked, wrong_routing, validate_failed
 	{
 		q.incIter();
 		common.output(q);
@@ -417,7 +417,7 @@ public class simulate
 		}
 	}
 
-	void nodeComplete(node n) throws pval_error, make_key_error, valid_not_checked
+	void nodeComplete(node n) throws pval_error, MakeKeyException, valid_not_checked
 	{
 		query tq;
 		node tn;
@@ -448,7 +448,7 @@ public class simulate
 	static int tol=0;
 	int prev=2;
 	
-	void validate() throws validate_failed, pval_error, make_key_error {
+	void validate() throws validate_failed, pval_error, MakeKeyException {
 		for (int i=0;i<Level.levels.length;i++) {
 			Level.levels[i].validate();
 		}

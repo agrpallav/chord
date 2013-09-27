@@ -13,7 +13,7 @@ public class Level {
 	public final int level;
 	public List<node> nodes=new ArrayList<node>();
 	
-	public Level(int level) throws UnsupportedEncodingException, NoSuchAlgorithmException, make_key_error, pval_error {
+	public Level(int level) throws UnsupportedEncodingException, NoSuchAlgorithmException, MakeKeyException, pval_error {
 		
 		this.level=level;
 		
@@ -52,7 +52,7 @@ public class Level {
 		m.ffilled=common.keyLength;
 	}
 	
-	void validate() throws validate_failed, pval_error, make_key_error
+	void validate() throws validate_failed, pval_error, MakeKeyException
 	{
 		int i=1;
 		node s=startNode;

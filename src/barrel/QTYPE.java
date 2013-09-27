@@ -4,5 +4,6 @@ public enum QTYPE {
 	NODEADD,
 	KEYFIND,
 	KEYADD,
-	KEYDEL
+	KEYDEL,
+	FINGER
 }
